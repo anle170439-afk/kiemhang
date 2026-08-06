@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#5b3a29">
+  <title>Coffee Stock ERP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">☕</div>
+      <div><strong>Coffee ERP</strong><span>Inventory Control</span></div>
+    </div>
+
+    <div class="side-card">
+      <span>Ngày làm việc</span>
+      <input id="workDate" type="date">
+    </div>
+
+    <nav class="side-nav">
+      <button class="nav-item active" data-view="employee"><span>🧾</span><div><b>Nhân viên kiểm hàng</b><small>Nhập số liệu thực tế</small></div></button>
+      <button class="nav-item" data-view="boss"><span>📊</span><div><b>Báo cáo sếp</b><small>Tự động tính toán</small></div></button>
+      <button class="nav-item" data-view="materials"><span>🧺</span><div><b>Nguyên vật liệu</b><small>Thêm, sửa, ngừng dùng</small></div></button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="status-dot"></div>
+      <div><b>Lưu cục bộ</b><small>Dữ liệu trên thiết bị này</small></div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">QUẢN LÝ KHO QUÁN CÀ PHÊ</p>
+        <h1 id="pageTitle">Kiểm soát hàng hóa 2 kho</h1>
+        <p class="subtitle" id="pageSubtitle">Theo dõi kho trên lầu và quầy pha chế trong cùng một hệ thống.</p>
+      </div>
+      <div class="hero-actions">
+        <button id="autoCarryBtn" class="btn ghost">↩ Tự lấy tồn hôm trước</button>
+        <button id="saveBtn" class="btn primary">💾 Lưu dữ liệu</button>
+      </div>
+    </header>
+
+    <section class="control-bar" id="inventoryToolbar">
+      <div class="search-box"><span>⌕</span><input id="searchInput" placeholder="Tìm theo mã hoặc tên nguyên liệu"></div>
+      <select id="groupFilter"><option value="">Tất cả nhóm hàng</option></select>
+      <button id="exportBtn" class="btn soft">Xuất JSON</button>
+      <label class="btn soft file-btn">Nhập JSON<input id="importInput" type="file" accept=".json"></label>
+      <button id="printBtn" class="btn soft">In báo cáo</button>
+    </section>
+
+    <section id="employeeView" class="view active">
+      <div class="section-head">
+        <div><h2>Phiếu kiểm hàng nhân viên</h2><p>Chỉ nhập tồn kho, nhập/xuất và số cân hàng lẻ cuối ngày. Hệ thống tự trừ khối lượng vỏ.</p></div>
+        <div class="badge">Bản nhập liệu</div>
+      </div>
+      <div class="notice"><b>Ngày đầu:</b> nhập tồn đầu kho. <b>Ngày sau:</b> hệ thống tự lấy tồn cuối hôm trước. Cột “Tồn lẻ cuối ngày” nhập số cân cả hộp; báo cáo sẽ tự trừ vỏ.</div>
+      <div class="table-card"><div class="table-wrap"><table id="employeeTable"></table></div></div>
+    </section>
+
+    <section id="bossView" class="view">
+      <div class="section-head">
+        <div><h2>Báo cáo quản lý</h2><p>Tự động quy đổi, trừ vỏ hộp và tính tiêu hao.</p></div>
+        <div class="badge blue">Bản báo cáo</div>
+      </div>
+      <div id="summaryCards" class="cards"></div>
+      <div class="table-card"><div class="table-wrap"><table id="bossTable"></table></div></div>
+    </section>
+
+    <section id="materialsView" class="view">
+      <div class="section-head">
+        <div><h2>Danh mục nguyên vật liệu</h2><p>Thêm mới, chỉnh sửa quy cách, khối lượng vỏ và trạng thái sử dụng.</p></div>
+        <button id="addMaterialBtn" class="btn primary">＋ Thêm nguyên liệu</button>
+      </div>
+      <div class="material-stats" id="materialStats"></div>
+      <div class="table-card"><div class="table-wrap"><table id="materialsTable"></table></div></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="materialModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h3 id="modalTitle">Thêm nguyên liệu</h3><p>Khai báo quy cách và khối lượng vỏ để hệ thống tự tính hàng lẻ.</p></div>
+      <button id="closeModalBtn" class="icon-btn">✕</button>
+    </div>
+    <form id="materialForm" class="form-grid">
+      <input type="hidden" id="editingCode">
+      <label>Mã nguyên liệu<input id="mCode" required placeholder="VD: SY03"></label>
+      <label>Nhóm<input id="mGroup" required placeholder="Syrup, Trà, Bột..."></label>
+      <label class="wide">Tên nguyên liệu<input id="mName" required placeholder="Tên đầy đủ"></label>
+      <label>ĐVT kho<input id="mStockUnit" required placeholder="chai, lon, gói..."></label>
+      <label>ĐVT lẻ<select id="mBaseUnit"><option value="g">g</option><option value="ml">ml</option></select></label>
+      <label>Khối lượng tịnh mỗi đơn vị<input id="mPackSize" type="number" min="0" step="0.01" required></label>
+      <label>Khối lượng vỏ<input id="mTareWeight" type="number" min="0" step="0.01" value="0"></label>
+      <label>Tồn tối thiểu<input id="mMinStock" type="number" min="0" step="0.01" value="0"></label>
+      <label>Trạng thái<select id="mActive"><option value="true">Đang sử dụng</option><option value="false">Ngừng sử dụng</option></select></label>
+      <div class="form-actions wide"><button type="button" id="cancelModalBtn" class="btn ghost">Hủy</button><button type="submit" class="btn primary">Lưu nguyên liệu</button></div>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="materials.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
