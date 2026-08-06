@@ -20,7 +20,7 @@ Khối lượng thực = Khối lượng cân cả hộp - Khối lượng vỏ.
 ## Lưu ý
 Dữ liệu vẫn được lưu bằng localStorage trên từng thiết bị. Muốn nhân viên và sếp dùng nhiều máy đồng bộ thời gian thực cần thêm Firebase hoặc Supabase.
 
-
+Commit changes
 ## Bản mobile mới
 Phiếu nhân viên đã rút gọn còn:
 Mã, Nhóm, Tên nguyên liệu, Đơn vị kho, Tồn đầu kho, Nhập kho, Xuất kho, Vỏ, Tồn lẻ cuối ngày, Ghi chú.
